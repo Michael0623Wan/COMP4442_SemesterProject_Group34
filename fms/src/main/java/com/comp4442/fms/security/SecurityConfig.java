@@ -16,9 +16,9 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                // ✅ Allow frontend pages & static assets
+                // ✅ Allow frontend static files
                 .requestMatchers(
-                    "/", 
+                    "/",
                     "/index.html",
                     "/dashboard.html",
                     "/style.css",
@@ -26,8 +26,11 @@ public class SecurityConfig {
                     "/favicon.ico"
                 ).permitAll()
 
-                // ✅ Allow auth APIs
-                .requestMatchers("/api/auth/**").permitAll()
+                // ✅ Allow ONLY registration (NOT login check)
+                .requestMatchers("/api/auth/register").permitAll()
+
+                // ❌ DO NOT permit /api/auth/check
+                // ✅ It must be authenticated
 
                 // ✅ Everything else requires login
                 .anyRequest().authenticated()
