@@ -16,7 +16,20 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
+                // ✅ Allow frontend pages & static assets
+                .requestMatchers(
+                    "/", 
+                    "/index.html",
+                    "/dashboard.html",
+                    "/style.css",
+                    "/script.js",
+                    "/favicon.ico"
+                ).permitAll()
+
+                // ✅ Allow auth APIs
                 .requestMatchers("/api/auth/**").permitAll()
+
+                // ✅ Everything else requires login
                 .anyRequest().authenticated()
             )
             .httpBasic(Customizer.withDefaults());
