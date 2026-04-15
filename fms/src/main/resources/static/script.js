@@ -15,22 +15,20 @@ function register() {
     .catch(() => alert("Registration error"));
 }
 
-// ===== Login (HTTP Basic Auth) =====
 function login() {
     const username = document.getElementById("loginUsername").value;
     const password = document.getElementById("loginPassword").value;
 
     const authHeader = "Basic " + btoa(username + ":" + password);
 
-    // Call ANY protected API to validate login
-    fetch(`${API_BASE}/api/files`, {
+    fetch("/api/auth/check", {
         method: "GET",
         headers: {
             "Authorization": authHeader
         }
     })
     .then(res => {
-        if (res.status === 200) {
+        if (res.ok) {
             localStorage.setItem("auth", authHeader);
             window.location.href = "dashboard.html";
         } else {
@@ -50,4 +48,4 @@ function logout() {
     localStorage.removeItem("auth");
     window.location.href = "index.html";
 }
-``
+
