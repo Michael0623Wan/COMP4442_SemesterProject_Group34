@@ -40,7 +40,7 @@ sudo dnf install maven -y
 
 ### Clone the GitHub Project
 run in EC2 server
-git clone https://github.com/<your-group>/<your-repo>.git
+git clone https://github.com/Michael0623Wan/COMP4442_SemesterProject_Group34.git
 cd fms
 
 ### Build & Run Spring Boot
