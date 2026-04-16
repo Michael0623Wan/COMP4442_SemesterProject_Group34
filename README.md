@@ -9,43 +9,70 @@ This project is a cloud file system developed using Spring Boot.
 The backend service and frontend files are deployed on an AWS EC2 instance.
 
 ### To connect to the EC2 server
-On Windows Powershell, run ssh -i comp4442-key.pem ec2-user@13.211.75.71 to enter the EC2 server
+Download comp4442-key.pem from this GitHub
+
+On Windows Powershell, in the same directory where comp4442-key.pem is placed, run 
+
+ssh -i comp4442-key.pem ec2-user@13.211.75.71
+
+to enter the EC2 server
 
 ### Inside EC2, required installation
-Install Java, run
+### Install Java, run
+
 sudo yum update -y
+
 sudo yum install java-17-amazon-corretto -y
 
-Install Git, run
+### Install Git, run
+
 sudo yum install git -y
 
-Install MariaDB Server, run
+### Install MariaDB Server, run
+
 sudo dnf install mariadb105-server -y
+
 sudo systemctl start mariadb
+
 sudo systemctl enable mariadb
+
 sudo mysql_secure_installation
+
 sudo mysql
 
-When entering into the MySQL server for the first time, run
+### When entering into the MySQL server for the first time, run
+
 CREATE DATABASE fileclouddb;
+
 USE fileclouddb;
+
 ALTER USER 'root'@'localhost'
+
 IDENTIFIED VIA mysql_native_password
+
 USING PASSWORD('YourStrongPassword123!');
+
 FLUSH PRIVILEGES;
+
 EXIT;
 
-Install Maven, run
+
+### Install Maven, run
 sudo dnf install maven -y
 
 ### Clone the GitHub Project
 run in EC2 server
+
 git clone https://github.com/Michael0623Wan/COMP4442_SemesterProject_Group34.git
+
+cd COMP4442_SemesterProject_Group34/
+
 cd fms
 
 ### Build & Run Spring Boot
-chmod +x mvnw
-./mvnw clean package
+
+mvn clean package
+
 java -jar target/*.jar
 
 ## How to Use the System
