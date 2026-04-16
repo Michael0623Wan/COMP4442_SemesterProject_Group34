@@ -56,6 +56,34 @@ FLUSH PRIVILEGES;
 
 EXIT;
 
+### Then run
+
+mysql -u root -p
+
+YourStrongPassword123!
+
+CREATE DATABASE IF NOT EXISTS fileclouddb;
+
+DROP USER IF EXISTS 'fmsuser'@'localhost';
+
+CREATE USER 'fmsuser'@'localhost'
+IDENTIFIED BY 'FmsPassword123!';
+
+GRANT ALL PRIVILEGES ON fileclouddb.* TO 'fmsuser'@'localhost';
+
+FLUSH PRIVILEGES;
+
+EXIT;
+
+mysql -u fmsuser -p
+
+FmsPassword123!
+
+USE fileclouddb;
+
+SHOW TABLES;
+
+EXIT;
 
 ### Install Maven, run
 sudo dnf install maven -y
