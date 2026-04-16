@@ -1,6 +1,6 @@
 // ===== Register =====
-function register() {
-    console.log("register() called");
+function register(event) {
+    event.preventDefault();
     const username = document.getElementById("registerUsername").value;
     const password = document.getElementById("registerPassword").value;
 
