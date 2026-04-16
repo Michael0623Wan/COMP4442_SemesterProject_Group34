@@ -29,7 +29,7 @@ function login() {
     .then(res => {
         if (res.ok) {
             localStorage.setItem("auth", authHeader);
-            window.location.href = "dashboard.html";
+            window.location.href = "/dashboard.html";
         } else {
             alert("Invalid username or password");
         }
