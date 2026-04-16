@@ -40,7 +40,7 @@ sudo mysql_secure_installation
 
 sudo mysql
 
-### When entering into the MySQL server for the first time, run
+### Inside MySQL, run
 
 CREATE DATABASE fileclouddb;
 
@@ -62,6 +62,8 @@ mysql -u root -p
 
 YourStrongPassword123!
 
+### Inside MySQL, run
+
 CREATE DATABASE IF NOT EXISTS fileclouddb;
 
 DROP USER IF EXISTS 'fmsuser'@'localhost';
@@ -75,9 +77,13 @@ FLUSH PRIVILEGES;
 
 EXIT;
 
+### Then run
+
 mysql -u fmsuser -p
 
 FmsPassword123!
+
+### Inside MySQL, run
 
 USE fileclouddb;
 
