@@ -1,11 +1,10 @@
-const API_BASE = "http://localhost:8080";
-
 // ===== Register =====
 function register() {
+    console.log("register() called");
     const username = document.getElementById("registerUsername").value;
     const password = document.getElementById("registerPassword").value;
 
-    fetch(`${API_BASE}/api/auth/register`, {
+    fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password })
