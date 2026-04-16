@@ -1,8 +1,11 @@
-// ===== Register =====
 function register(event) {
     event.preventDefault();
-    const username = document.getElementById("registerUsername").value;
-    const password = document.getElementById("registerPassword").value;
+
+    const usernameInput = document.getElementById("registerUsername");
+    const passwordInput = document.getElementById("registerPassword");
+
+    const username = usernameInput.value;
+    const password = passwordInput.value;
 
     fetch("/api/auth/register", {
         method: "POST",
@@ -15,14 +18,20 @@ function register(event) {
         usernameInput.value = "";
         passwordInput.value = "";
     })
-    .catch(() => alert("Registration error"));
-
+    .catch(err => {
+        console.error(err);
+        alert("Registration error");
+    });
 }
 
 function login(event) {
     event.preventDefault();
-    const username = document.getElementById("loginUsername").value;
-    const password = document.getElementById("loginPassword").value;
+
+    const usernameInput = document.getElementById("loginUsername");
+    const passwordInput = document.getElementById("loginPassword");
+
+    const username = usernameInput.value;
+    const password = passwordInput.value;
 
     const authHeader = "Basic " + btoa(username + ":" + password);
 
@@ -37,12 +46,16 @@ function login(event) {
             localStorage.setItem("auth", authHeader);
             usernameInput.value = "";
             passwordInput.value = "";
+
             window.location.href = "/dashboard.html";
         } else {
             alert("Invalid username or password");
         }
     })
-    .catch(() => alert("Login failed"));
+    .catch(err => {
+        console.error(err);
+        alert("Login failed");
+    });
 }
 
 // ===== Auth header helper =====
