@@ -10,8 +10,13 @@ function register() {
         body: JSON.stringify({ username, password })
     })
     .then(res => res.text())
-    .then(msg => alert(msg))
+    .then(msg => {
+        alert(msg);
+        usernameInput.value = "";
+        passwordInput.value = "";
+    })
     .catch(() => alert("Registration error"));
+
 }
 
 function login() {
@@ -29,6 +34,8 @@ function login() {
     .then(res => {
         if (res.ok) {
             localStorage.setItem("auth", authHeader);
+            usernameInput.value = "";
+            passwordInput.value = "";
             window.location.href = "/dashboard.html";
         } else {
             alert("Invalid username or password");
