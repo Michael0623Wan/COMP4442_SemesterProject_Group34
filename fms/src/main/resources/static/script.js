@@ -19,7 +19,8 @@ function register(event) {
 
 }
 
-function login() {
+function login(event) {
+    event.preventDefault();
     const username = document.getElementById("loginUsername").value;
     const password = document.getElementById("loginPassword").value;
 
