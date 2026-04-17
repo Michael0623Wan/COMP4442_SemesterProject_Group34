@@ -1,9 +1,6 @@
 # COMP4442_SemesterProject_Group34
 COMP4442 Group 34  Cloud‑based File Management System Group Memebers：Wan Chun Ho, Chan Chi Hon, Chu Wing Ho Dickens 
 
-## Database Setup
-FileSystemDatabase.sql is the schema file
-
 ## Server Deployment & Setup
 This project is a cloud file system developed using Spring Boot.
 The backend service and frontend files are deployed on an AWS EC2 instance.
