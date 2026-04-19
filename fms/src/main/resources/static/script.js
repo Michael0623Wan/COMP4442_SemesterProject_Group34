@@ -44,6 +44,7 @@ function login(event) {
     .then(res => {
         if (res.ok) {
             localStorage.setItem("auth", authHeader);
+            localStorage.setItem("username", username);
             usernameInput.value = "";
             passwordInput.value = "";
 
@@ -63,55 +64,127 @@ function getAuthHeader() {
     return localStorage.getItem("auth");
 }
 
+function getCurrentUsername() {
+    const storedUsername = localStorage.getItem("username");
+    if (storedUsername) {
+        return storedUsername;
+    }
+
+    const authHeader = getAuthHeader();
+    if (!authHeader || !authHeader.startsWith("Basic ")) {
+        return null;
+    }
+
+    try {
+        const decoded = atob(authHeader.substring(6));
+        return decoded.split(":")[0] || null;
+    } catch {
+        return null;
+    }
+}
+
+function requireAuth() {
+    const authHeader = getAuthHeader();
+    const username = getCurrentUsername();
+
+    if (!authHeader || !username) {
+        window.location.href = "/index.html";
+        return null;
+    }
+
+    return { authHeader, username };
+}
+
+function showMessage(text) {
+    const message = document.getElementById("message");
+    if (message) {
+        message.innerText = text;
+        return;
+    }
+
+    alert(text);
+}
+
 // ===== Logout =====
 function logout() {
     localStorage.removeItem("auth");
+    localStorage.removeItem("username");
     window.location.href = "index.html";
 }
 
 // ===== File upload =====
 function uploadFile() {
+    const session = requireAuth();
+    if (!session) {
+        return;
+    }
+
     const fileInput = document.getElementById("fileUpload");
     const file = fileInput.files[0];
+
+    if (!file) {
+        showMessage("Please choose a file first.");
+        return;
+    }
 
     const formData = new FormData();
     formData.append("file", file);
 
-    fetch("/api/files/upload", {
+    fetch(`/api/files/upload?username=${encodeURIComponent(session.username)}`, {
         method: "POST",
         headers: {
-            "Authorization": getAuthHeader()
+            "Authorization": session.authHeader
         },
         body: formData
     })
-    .then(res => res.text())
+    .then(async res => {
+        const text = await res.text();
+        if (!res.ok) {
+            throw new Error(text || "Upload failed.");
+        }
+
+        return text;
+    })
     .then(msg => {
-        message.innerText = msg || "Upload successful.";
+        showMessage(msg || "Upload successful.");
         fileInput.value = "";
         loadFiles();
     })
-    .catch(() => {
-        message.innerText = "Upload failed.";
+    .catch(err => {
+        showMessage(err.message || "Upload failed.");
     });
 }
 
 // ===== Load files =====
 function loadFiles() {
+    const session = requireAuth();
+    if (!session) {
+        return;
+    }
+
     const tableBody = document.getElementById("fileTableBody");
     
-    fetch("/api/files", {
+    fetch(`/api/files?username=${encodeURIComponent(session.username)}`, {
         headers: {
-            "Authorization": getAuthHeader()
+            "Authorization": session.authHeader
         }
     })
-    .then(res => res.json())
-    .then(files => {
+    .then(async res => {
+        if (!res.ok) {
+            throw new Error("Error loading files.");
+        }
 
+        return res.json();
+    })
+    .then(files => {
         tableBody.innerHTML = files.map(file => `
             <tr>
                 <td>${file.id}</td>
-                <td>${file.filename || file.originalName || "Unnamed file"}</td>
-                <td><button onclick="downloadFile(${file.id})">Download</button></td>
+                <td>${file.originalFilename || "Unnamed file"}</td>
+                <td>
+                    <button onclick="downloadFile(${file.id})">Download</button>
+                    <button onclick="deleteFile(${file.id})">Delete</button>
+                </td>
             </tr>
         `).join("");
     })
@@ -122,5 +195,68 @@ function loadFiles() {
 
 // ===== Download file =====
 function downloadFile(id) {
-    window.open(`/api/files/download/${id}`, "_blank");
+    const session = requireAuth();
+    if (!session) {
+        return;
+    }
+
+    fetch(`/api/files/${id}/download?username=${encodeURIComponent(session.username)}`, {
+        headers: {
+            "Authorization": session.authHeader
+        }
+    })
+    .then(async res => {
+        if (!res.ok) {
+            throw new Error("Download failed.");
+        }
+
+        return {
+            blob: await res.blob(),
+            disposition: res.headers.get("Content-Disposition")
+        };
+    })
+    .then(({ blob, disposition }) => {
+        const filenameMatch = disposition && disposition.match(/filename="?([^\"]+)"?/);
+        const filename = filenameMatch ? filenameMatch[1] : `file-${id}`;
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+    })
+    .catch(err => {
+        showMessage(err.message || "Download failed.");
+    });
+}
+
+function deleteFile(id) {
+    const session = requireAuth();
+    if (!session) {
+        return;
+    }
+
+    fetch(`/api/files/${id}?username=${encodeURIComponent(session.username)}`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": session.authHeader
+        }
+    })
+    .then(async res => {
+        const text = await res.text();
+        if (!res.ok) {
+            throw new Error(text || "Delete failed.");
+        }
+
+        return text;
+    })
+    .then(msg => {
+        showMessage(msg || "File deleted successfully.");
+        loadFiles();
+    })
+    .catch(err => {
+        showMessage(err.message || "Delete failed.");
+    });
 }
